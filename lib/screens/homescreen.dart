@@ -8,22 +8,19 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:text_to_speech/text_to_speech.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-
-
-class HomeScreen extends StatefulWidget
-{
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-
-
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin
-{
-  TextEditingController userInputTextEditingController = TextEditingController();
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
+  TextEditingController userInputTextEditingController =
+      TextEditingController();
   final SpeechToText speechToTextInstance = SpeechToText();
   String recordedAudioString = "";
   bool isLoading = false;
@@ -33,48 +30,38 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   String answerTextFromOpenAI = "";
   final TextToSpeech textToSpeechInstance = TextToSpeech();
 
-
-  void initializeSpeechToText() async
-  {
+  void initializeSpeechToText() async {
     await speechToTextInstance.initialize();
 
-    setState(() {
-
-    });
+    setState(() {});
   }
 
-  void startListeningNow() async
-  {
+  void startListeningNow() async {
     FocusScope.of(context).unfocus();
 
     await speechToTextInstance.listen(onResult: onSpeechToTextResult);
 
-    setState(() {
-
-    });
+    setState(() {});
   }
 
-  void stopListeningNow() async
-  {
+  void stopListeningNow() async {
     await speechToTextInstance.stop();
 
-    setState(() {
-
-    });
+    setState(() {});
   }
 
-  void onSpeechToTextResult(SpeechRecognitionResult recognitionResult)
-  {
+  void onSpeechToTextResult(SpeechRecognitionResult recognitionResult) {
     recordedAudioString = recognitionResult.recognizedWords;
 
-    speechToTextInstance.isListening ? null : sendRequestToOpenAI(recordedAudioString);
+    speechToTextInstance.isListening
+        ? null
+        : sendRequestToOpenAI(recordedAudioString);
 
     print("Speech Result:");
     print(recordedAudioString);
   }
 
-  Future<void> sendRequestToOpenAI(String userInput) async
-  {
+  Future<void> sendRequestToOpenAI(String userInput) async {
     stopListeningNow();
 
     setState(() {
@@ -82,14 +69,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     });
 
     //send the request to openAI using our APIService
-    await APIService().requestOpenAI(userInput, modeOpenAI, 2000).then((value)
-    {
+    await APIService().requestOpenAI(userInput, modeOpenAI, 2000).then((value) {
       setState(() {
         isLoading = false;
       });
 
-      if(value.statusCode == 401)
-      {
+      if (value.statusCode == 401) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
@@ -103,22 +88,19 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
       final responseAvailable = jsonDecode(value.body);
 
-      if(modeOpenAI == "chat")
-      {
+      if (modeOpenAI == "chat") {
         setState(() {
-          answerTextFromOpenAI = utf8.decode(responseAvailable["choices"][0]["text"].toString().codeUnits);
+          answerTextFromOpenAI = utf8.decode(
+              responseAvailable["choices"][0]["text"].toString().codeUnits);
 
           print("ChatGPT Chatbot: ");
           print(answerTextFromOpenAI);
         });
 
-        if(speakFRIDAY == true)
-        {
+        if (speakFRIDAY == true) {
           textToSpeechInstance.speak(answerTextFromOpenAI);
         }
-      }
-      else
-      {
+      } else {
         //image generation
         setState(() {
           imageUrlFromOpenAI = responseAvailable["data"][0]["url"];
@@ -127,8 +109,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           print(imageUrlFromOpenAI);
         });
       }
-    }).catchError((errorMessage)
-    {
+    }).catchError((errorMessage) {
       setState(() {
         isLoading = false;
       });
@@ -151,15 +132,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   @override
-  Widget build(BuildContext context)
-  {
+  Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.white,
-        onPressed: ()
-        {
-          if(!isLoading)
-          {
+        onPressed: () {
+          if (!isLoading) {
             setState(() {
               speakFRIDAY = !speakFRIDAY;
             });
@@ -167,43 +145,40 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
           textToSpeechInstance.stop();
         },
-        child: speakFRIDAY ? Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Image.asset(
-              "images/sound.png"
-          ),
-        ) : Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Image.asset(
-              "images/mute.png"
-          ),
-        ),
+        child: speakFRIDAY
+            ? Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Image.asset("images/sound.png"),
+              )
+            : Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Image.asset("images/mute.png"),
+              ),
       ),
       appBar: AppBar(
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-              gradient: LinearGradient(
-                  colors: [
-                    Colors.purpleAccent.shade100,
-                    Colors.deepPurple,
-                  ]
-              )
-          ),
-        ),
-        title: Image.asset(
-          "images/logo.png",
-          width: 140,
+        title: Row(
+          children: [
+            Image.asset(
+              "images/1.png",
+              width: 50,
+            ),
+            SizedBox(
+              width: 10,
+            ),
+            Text(
+              "DUAL AI",
+              style: GoogleFonts.lato(fontSize: 24),
+            ),
+          ],
         ),
         titleSpacing: 10,
         elevation: 2,
         actions: [
-
           //chat
           Padding(
             padding: const EdgeInsets.only(right: 4, top: 4),
             child: InkWell(
-              onTap: ()
-              {
+              onTap: () {
                 setState(() {
                   modeOpenAI = "chat";
                 });
@@ -220,8 +195,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           Padding(
             padding: const EdgeInsets.only(right: 8, left: 4),
             child: InkWell(
-              onTap: ()
-              {
+              onTap: () {
                 setState(() {
                   modeOpenAI = "image";
                 });
@@ -233,40 +207,46 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               ),
             ),
           ),
-
         ],
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(colors: [
+              Color.fromARGB(255, 78, 13, 151),
+              Color.fromARGB(255, 107, 15, 168),
+            ], begin: Alignment.topLeft, end: Alignment.bottomRight),
+          ),
           child: Column(
             children: [
-
-              const SizedBox(height: 40,),
+              const SizedBox(
+                height: 40,
+              ),
 
               //image
               Center(
                 child: InkWell(
-                  onTap: ()
-                  {
+                  onTap: () {
                     speechToTextInstance.isListening
                         ? stopListeningNow()
                         : startListeningNow();
                   },
                   child: speechToTextInstance.isListening
-                      ? Center(child: LoadingAnimationWidget.beat(
-                    size: 300,
-                    color: speechToTextInstance.isListening
-                        ? Colors.deepPurple
-                        : isLoading
-                        ? Colors.deepPurple[400]!
-                        : Colors.deepPurple[200]!,
-                  ),)
+                      ? Center(
+                          child: LoadingAnimationWidget.beat(
+                            size: 300,
+                            color: speechToTextInstance.isListening
+                                ? Colors.purpleAccent.shade400
+                                : isLoading
+                                    ? Colors.purpleAccent.shade100
+                                    : Colors.deepPurple,
+                          ),
+                        )
                       : Image.asset(
-                    "images/assistant_icon.png",
-                    height: 300,
-                    width: 300,
-                  ),
+                          "images/assistant_icon.png",
+                          height: 300,
+                          width: 300,
+                        ),
                 ),
               ),
 
@@ -275,105 +255,93 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               ),
 
               //text field with a button
-              Row(
-                children: [
-
-                  //text field
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 4.0),
-                      child: TextField(
-                        controller: userInputTextEditingController,
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: "how can i help you?",
+              Padding(
+                padding: const EdgeInsets.only(left: 10, right: 15),
+                child: Row(
+                  children: [
+                    //text field
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 5.0),
+                        child: TextField(
+                          controller: userInputTextEditingController,
+                          decoration: InputDecoration(
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20),
+                                borderSide: const BorderSide(
+                                  color: Colors.white,
+                                  width: 1.0,
+                                ),
+                              ),
+                              hintText: "how can i help you?",
+                              hintStyle: GoogleFonts.aboreto(
+                                  fontSize: 15, color: Colors.white)),
                         ),
                       ),
                     ),
-                  ),
 
-                  const SizedBox(width: 10,),
+                    const SizedBox(
+                      width: 15,
+                    ),
 
-                  //button
-                  InkWell(
-                    onTap: ()
-                    {
-                      if(userInputTextEditingController.text.isNotEmpty)
-                      {
-                        sendRequestToOpenAI(userInputTextEditingController.text.toString());
-                      }
-                    },
-                    child: AnimatedContainer(
-                      padding: const EdgeInsets.all(15),
-                      decoration: const BoxDecoration(
-                          shape: BoxShape.rectangle,
-                          color: Colors.deepPurpleAccent
-                      ),
-                      duration: const Duration(
-                        milliseconds: 1000,
-                      ),
-                      curve: Curves.bounceInOut,
-                      child: const Icon(
-                        Icons.send,
-                        color: Colors.white,
-                        size: 30,
+                    //button
+                    InkWell(
+                      onTap: () {
+                        if (userInputTextEditingController.text.isNotEmpty) {
+                          sendRequestToOpenAI(
+                              userInputTextEditingController.text.toString());
+                        }
+                      },
+                      child: AnimatedContainer(
+                        padding: const EdgeInsets.all(15),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20.0),
+                            color: const Color.fromARGB(255, 60, 30, 144)),
+                        duration: const Duration(
+                          milliseconds: 1000,
+                        ),
+                        curve: Curves.bounceInOut,
+                        child: const Icon(
+                          Icons.send,
+                          color: Colors.white,
+                          size: 30,
+                        ),
                       ),
                     ),
-                  ),
-
-                ],
+                  ],
+                ),
               ),
 
               const SizedBox(
-                height: 24,
+                height: 25,
               ),
 
               //display result
               modeOpenAI == "chat"
                   ? SelectableText(
-                    answerTextFromOpenAI,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )
+                      answerTextFromOpenAI,
+                      style:
+                          GoogleFonts.lato(fontSize: 20, color: Colors.white),
+                    )
                   : modeOpenAI == "image" && imageUrlFromOpenAI.isNotEmpty
-                  ? Column(
-                    //image
-                    children: [
-                      Image.network(
-                        imageUrlFromOpenAI,
-                      ),
-                      const SizedBox(height: 14,),
-                      // ElevatedButton(
-                      //   onPressed: () async
-                      //   {
-                      //     String? imageStatus = await ImageDownloader.downloadImage(imageUrlFromOpenAI);
-
-                      //     if(imageStatus != null)
-                      //     {
-                      //       ScaffoldMessenger.of(context).showSnackBar(
-                      //         const SnackBar(
-                      //           content: Text("Image downloaded Successfully."),
-                      //         ),
-                      //       );
-                      //     }
-                      //   },
-                      //   style: ElevatedButton.styleFrom(
-                      //     backgroundColor: Colors.deepPurple,
-                      //   ),
-                      //   child: const Text(
-                      //     "Download this Image",
-                      //     style: TextStyle(
-                      //       color: Colors.white,
-                      //     ),
-                      //   ),
-                      // ),
-                    ],
-                  )
-                  : Container()
-
+                      ? Column(
+                          //image
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.network(
+                                  imageUrlFromOpenAI,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 14,
+                            ),
+                          ],
+                        )
+                      : Container()
             ],
           ),
         ),
