@@ -2,11 +2,12 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:open_ai_app/api/apiServices.dart';
-import 'package:open_ai_app/api_key.dart';
-import 'package:image_downloader/image_downloader.dart';
+// import 'package:open_ai_app/api_key.dart';
+// import 'package:image_downloader/image_downloader.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
+import 'package:text_to_speech/text_to_speech.dart';
 
 
 
@@ -26,9 +27,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   final SpeechToText speechToTextInstance = SpeechToText();
   String recordedAudioString = "";
   bool isLoading = false;
+  bool speakFRIDAY = true;
   String modeOpenAI = "chat";
   String imageUrlFromOpenAI = "";
   String answerTextFromOpenAI = "";
+  final TextToSpeech textToSpeechInstance = TextToSpeech();
 
 
   void initializeSpeechToText() async
@@ -108,6 +111,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           print("ChatGPT Chatbot: ");
           print(answerTextFromOpenAI);
         });
+
+        if(speakFRIDAY == true)
+        {
+          textToSpeechInstance.speak(answerTextFromOpenAI);
+        }
       }
       else
       {
@@ -150,12 +158,24 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         backgroundColor: Colors.white,
         onPressed: ()
         {
+          if(!isLoading)
+          {
+            setState(() {
+              speakFRIDAY = !speakFRIDAY;
+            });
+          }
 
+          textToSpeechInstance.stop();
         },
-        child: Padding(
+        child: speakFRIDAY ? Padding(
           padding: const EdgeInsets.all(4.0),
           child: Image.asset(
               "images/sound.png"
+          ),
+        ) : Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Image.asset(
+              "images/mute.png"
           ),
         ),
       ),
@@ -326,30 +346,30 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         imageUrlFromOpenAI,
                       ),
                       const SizedBox(height: 14,),
-                      ElevatedButton(
-                        onPressed: () async
-                        {
-                          String? imageStatus = await ImageDownloader.downloadImage(imageUrlFromOpenAI);
+                      // ElevatedButton(
+                      //   onPressed: () async
+                      //   {
+                      //     String? imageStatus = await ImageDownloader.downloadImage(imageUrlFromOpenAI);
 
-                          if(imageStatus != null)
-                          {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Image downloaded Successfully."),
-                              ),
-                            );
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.deepPurple,
-                        ),
-                        child: const Text(
-                          "Download this Image",
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
+                      //     if(imageStatus != null)
+                      //     {
+                      //       ScaffoldMessenger.of(context).showSnackBar(
+                      //         const SnackBar(
+                      //           content: Text("Image downloaded Successfully."),
+                      //         ),
+                      //       );
+                      //     }
+                      //   },
+                      //   style: ElevatedButton.styleFrom(
+                      //     backgroundColor: Colors.deepPurple,
+                      //   ),
+                      //   child: const Text(
+                      //     "Download this Image",
+                      //     style: TextStyle(
+                      //       color: Colors.white,
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   )
                   : Container()
