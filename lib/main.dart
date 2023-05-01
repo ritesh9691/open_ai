@@ -1,10 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'package:open_ai_app/screens/homescreen.dart';
+import 'package:open_ai_app/signIn.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -18,7 +21,7 @@ class MyApp extends StatelessWidget {
         ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 96, 59, 181));
     return MaterialApp(
       title: 'OpenAI ChatGpt Dale-E',
-       theme: ThemeData().copyWith(
+      theme: ThemeData().copyWith(
         useMaterial3: true,
         colorScheme: kColorSheme,
         appBarTheme: const AppBarTheme().copyWith(
@@ -42,7 +45,8 @@ class MyApp extends StatelessWidget {
             ),
       ),
       debugShowCheckedModeBanner: false,
-      home: HomeScreen(),
+      home: FirebaseAuth.instance.currentUser == null?
+      SignIn():HomeScreen(),
     );
   }
 }

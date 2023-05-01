@@ -1,10 +1,12 @@
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:open_ai_app/api/apiServices.dart';
 // import 'package:open_ai_app/api_key.dart';
 // import 'package:image_downloader/image_downloader.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:open_ai_app/signIn.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:text_to_speech/text_to_speech.dart';
@@ -134,26 +136,32 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.white,
-        onPressed: () {
-          if (!isLoading) {
-            setState(() {
-              speakFRIDAY = !speakFRIDAY;
-            });
-          }
+      backgroundColor: Color.fromARGB(255, 78, 13, 151),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(
+          bottom: 80,
+        ),
+        child: FloatingActionButton(
+          backgroundColor: Colors.white,
+          onPressed: () {
+            if (!isLoading) {
+              setState(() {
+                speakFRIDAY = !speakFRIDAY;
+              });
+            }
 
-          textToSpeechInstance.stop();
-        },
-        child: speakFRIDAY
-            ? Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: Image.asset("images/sound.png"),
-              )
-            : Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: Image.asset("images/mute.png"),
-              ),
+            textToSpeechInstance.stop();
+          },
+          child: speakFRIDAY
+              ? Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Image.asset("images/sound.png"),
+                )
+              : Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Image.asset("images/mute.png"),
+                ),
+        ),
       ),
       appBar: AppBar(
         title: Row(
@@ -162,21 +170,30 @@ class _HomeScreenState extends State<HomeScreen>
               "images/1.png",
               width: 50,
             ),
-            SizedBox(
+            const SizedBox(
               width: 10,
             ),
-            Text(
-              "DUAL AI",
-              style: GoogleFonts.lato(fontSize: 24),
+            InkWell(
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) {
+                  return SignIn();
+                }));
+              },
+              child: Text(
+                "Aurora ",
+                style: GoogleFonts.lato(fontSize: 28),
+              ),
             ),
           ],
         ),
-        titleSpacing: 10,
-        elevation: 2,
+        titleSpacing: 7,
+        elevation: 5,
         actions: [
           //chat
           Padding(
-            padding: const EdgeInsets.only(right: 4, top: 4),
+            padding: const EdgeInsets.only(right: 7, top: 7),
             child: InkWell(
               onTap: () {
                 setState(() {
@@ -193,7 +210,7 @@ class _HomeScreenState extends State<HomeScreen>
 
           //image
           Padding(
-            padding: const EdgeInsets.only(right: 8, left: 4),
+            padding: const EdgeInsets.only(right: 15, left: 5),
             child: InkWell(
               onTap: () {
                 setState(() {
@@ -236,7 +253,7 @@ class _HomeScreenState extends State<HomeScreen>
                           child: LoadingAnimationWidget.beat(
                             size: 300,
                             color: speechToTextInstance.isListening
-                                ? Colors.purpleAccent.shade400
+                                ? Color.fromARGB(255, 78, 13, 151)
                                 : isLoading
                                     ? Colors.purpleAccent.shade100
                                     : Colors.deepPurple,
@@ -265,6 +282,8 @@ class _HomeScreenState extends State<HomeScreen>
                         padding: const EdgeInsets.only(left: 5.0),
                         child: TextField(
                           controller: userInputTextEditingController,
+                          style: GoogleFonts.aboreto(
+                              fontSize: 15, color: Colors.white),
                           decoration: InputDecoration(
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20),

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "975822600072",
+    "project_id": "brainwave-bc6d4",
+    "storage_bucket": "brainwave-bc6d4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:975822600072:android:ba71f719d337200c57ec3d",
+        "android_client_info": {
+          "package_name": "com.example.open_ai_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "975822600072-tuc3rrhgjgnkur2c4gjbct816c77bsl3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.open_ai_app",
+            "certificate_hash": "8e0a3f3eadcf28a814823c2ef1d6bc153c89b781"
+          }
+        },
+        {
+          "client_id": "975822600072-vd93151f0n3l7b0g0rdn4j518icamaqh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDBLmFUJU5uJembMkNBv4w7CwzPTmpUQsg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "975822600072-71sgb1q8uup8plh1e1qkpnu12a6lqcft.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
